@@ -3,8 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   taskAdded: false,
-  taskObject:[],
+  taskObject: [],
   modelStatus: false,
+  lists: [],
+  updateId: null,
 };
 
 const HPtaskSlice = createSlice({
@@ -23,8 +25,17 @@ const HPtaskSlice = createSlice({
       state.modelStatus = action.payload;
       return state;
     },
+    lists: (state, action) => {
+      state.lists = action.payload;
+      return state;
+    },
+    updateTaskId: (state, action) => {
+      state.updateId = action.payload;
+      return state;
+    },
   },
 });
 
-export const { taskAdded, taskObject, modalToggler } = HPtaskSlice.actions;
+export const { taskAdded, taskObject, modalToggler, lists, updateTaskId } =
+  HPtaskSlice.actions;
 export default HPtaskSlice.reducer;

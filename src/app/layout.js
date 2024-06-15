@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import Navigation from "@/components/navigation";
 import "./globals.css";
 import { Provider } from "react-redux";
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Lato&display=swap"
           rel="stylesheet"
         />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
       </head>
       <body className="flex">
         <App>{children}</App>

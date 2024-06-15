@@ -6,17 +6,24 @@ import CheckList from "@/components/checkList";
 import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { database } from "@/firebaseConfig";
 import { useDispatch, useSelector } from "react-redux";
-import { taskObject } from "@/Slices/taskSlice";
+import { modalToggler, taskObject } from "@/Slices/taskSlice";
 import FormModal from "@/components/Modals/modal";
+import UpdatePanel from "@/components/UpdatePanel";
+import { getFilteredList, getRestFilteredList } from "./utils/utils";
 
 const dbInstance = collection(database, "Task");
 export default function Home() {
   const dispatch = useDispatch();
   const task = useSelector((state) => state.tasks);
+  const listsValue = task.lists;
 
   const [listObject, setListObject] = useState(task.taskObject);
   const [modal, setModal] = useState(task.modelStatus);
   const [numberOfTask, setNumerOfTask] = useState(0);
+  const [showUpdatePanel, setShowUpdatePanel] = useState(false);
+  const updateTaskToggler = () => {
+    setShowUpdatePanel(!showUpdatePanel);
+  };
 
   useEffect(() => {
     // Create a function to handle updates and unsubscribe from the listener when the component unmounts
@@ -27,11 +34,22 @@ export default function Home() {
         const id = doc.id;
         const value = detail.task;
         const date = detail.dueDate;
-        setNumerOfTask((prevData) => prevData + 1);
-        return { value: value, id: id, date: date, list: detail.list };
+
+        return {
+          value: value,
+          id: id,
+          date: date,
+          list: detail.list,
+          desc: detail.description,
+          priority: detail.priority,
+          completed: detail.completed,
+          compltedDate: detail.completedDate,
+        };
       });
-      setListObject(newData);
-      dispatch(taskObject(newData));
+      const filteredData = newData.filter((ele) => ele.completed == false);
+      setNumerOfTask(filteredData.length);
+      setListObject(filteredData);
+      dispatch(taskObject(filteredData));
     });
 
     // Clean up the listener when the component unmounts
@@ -46,44 +64,74 @@ export default function Home() {
 
   return (
     <>
-      <div className={`container m-8 ${modal ? "blur-sm" : ""}`}>
-        {/* Heading */}
-        <div className="flex m-8">
-          <h1 className="font-bold text-6xl font-lato text-gray-700">
-            Upcoming
-          </h1>
-          <div className="container w-16 rounded-md border-2 ml-10 flex items-center justify-center mt-1">
-            <span className="font-lato text-3xl font-semibold text-gray-500">
-              {numberOfTask}
+      <div
+        className={`container m-8 ${modal ? "blur-sm" : ""} w-full ${
+          showUpdatePanel ? "flex" : ""
+        }`}
+      >
+        <div className={`${showUpdatePanel ? "w-3/4" : ""}`}>
+          {/* Heading */}
+          <div className="flex m-8">
+            <h1 className="font-bold text-6xl font-lato text-gray-700">
+              Upcoming
+            </h1>
+            <div className="container w-16 rounded-md border-2 ml-10 flex items-center justify-center mt-1">
+              <span className="font-lato text-3xl font-semibold text-gray-500">
+                {numberOfTask}
+              </span>
+            </div>
+          </div>
+
+          {/* Add new Task */}
+          <button
+            onClick={() => dispatch(modalToggler(true))}
+            className="container p-2 px-11 border-2 rounded-md flex align-middle mt-6 mb-6 text-2xl"
+          >
+            <i class="fa-solid fa-plus  relative  text-gray-400 top-1"></i>
+            <span className="font-medium left-2 relative font-lato text-gray-400 pl-3">
+              Add New Task
             </span>
+          </button>
+
+          {/* Today */}
+          <CheckList
+            heading="Today"
+            list={getFilteredList(listObject, 0)}
+            listValue={listsValue}
+            clickEvent={updateTaskToggler}
+          />
+
+          {/* Bottom Fragger */}
+          <div className="conatiner flex justify-evenly my-6">
+            {/* Tommorow */}
+            <CheckList
+              heading="Tommorow"
+              addClass="mr-6"
+              list={getFilteredList(listObject, 1)}
+              listValue={listsValue}
+              clickEvent={updateTaskToggler}
+            />
+            {/* This Week */}
+            <CheckList
+              heading="Rest"
+              addClass="ml-6"
+              list={getRestFilteredList(listObject)}
+              listValue={listsValue}
+              clickEvent={updateTaskToggler}
+            />
           </div>
         </div>
-
-        {/* Today */}
-        <CheckList
-          heading="Today"
-          list={listObject.filter((ele) => ele.date == "Today")}
-        />
-
-        {/* Bottom Fragger */}
-        <div className="conatiner flex justify-evenly my-6">
-          {/* Tommorow */}
-          <CheckList
-            heading="Tommorow"
-            addClass="mr-6"
-            list={listObject.filter((ele) => ele.date == "Tommorow")}
+        {/* Panel */}
+        {showUpdatePanel && (
+          <UpdatePanel
+            clickEvent={updateTaskToggler}
+            listsValue={listsValue}
+            dbInstance={dbInstance}
           />
-          {/* This Week */}
-          <CheckList
-            heading="This Week"
-            addClass="ml-6"
-            list={listObject.filter(
-              (ele) => ele.date != "Today" && ele.date != "Tommorow"
-            )}
-          />
-        </div>
+        )}
       </div>
-      {modal && <FormModal />}
+
+      {modal && <FormModal db={dbInstance} />}
     </>
   );
 }

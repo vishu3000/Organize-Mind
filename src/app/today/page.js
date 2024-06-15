@@ -1,13 +1,30 @@
 "use client";
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { database } from "@/firebaseConfig";
+import Image from "next/image";
+import noDataImage from "../../../public/NoData.jpg";
+import { differenceInDays, getColor, getPriorityHtml } from "../utils/utils";
+import { format } from "date-fns";
+import { useSelector } from "react-redux";
 
 const dbInstance = collection(database, "Task");
 
 export default function Today() {
   const [todayList, setTodayList] = useState([]);
   const [numberOfTask, setNumerOfTask] = useState(0);
+  const task = useSelector((state) => state.tasks);
+  const listsValue = task.lists;
+
+  const [showDescription, setShowDescription] = useState({
+    status: false,
+    index: 0,
+  });
+
+  const showDescriptionHnalder = (index) => {
+    setShowDescription({ status: !showDescription.status, index: index });
+  };
+
   useEffect(() => {
     const listData = () => {
       let dummyList = [];
@@ -15,8 +32,11 @@ export default function Today() {
         data.docs.forEach((item) => {
           const detail = item.data();
           const id = item.id;
-          const value = detail.task;
-          if (detail.dueDate == "Today") {
+          const value = detail;
+          if (
+            differenceInDays(detail.dueDate) == 0 &&
+            detail.completed != true
+          ) {
             dummyList = [{ value: value, id: id }, ...dummyList];
           }
           setNumerOfTask(dummyList.length);
@@ -26,6 +46,7 @@ export default function Today() {
     };
     listData();
   }, []);
+
   return (
     <div className="container m-8">
       {/* Heading */}
@@ -38,33 +59,89 @@ export default function Today() {
         </div>
       </div>
 
-      {/* <CheckList heading="Today" onClick={showModal} list={listObject.today} /> */}
-
-      {/* List */}
-      <ul className="container mt-3">
-        {todayList?.map((ele, index) => {
-          return (
-            <li className="container pt-3 ml-6" key={index} id={ele.id}>
-              <div className="">
-                <div class="flex items-center  text-xl ">
-                  <input
-                    id="default-checkbox"
-                    type="checkbox"
-                    value=""
-                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <label for="default-checkbox" class="ms-2   text-gray-500 ">
-                    {ele.value}
-                  </label>
+      {todayList.length > 0 ? (
+        <ul className="container mt-3">
+          {todayList?.map((ele, index) => {
+            return (
+              <li className="container pt-3 ml-6" key={index} id={ele.id}>
+                <div className="">
+                  <div class="flex items-center  text-xl justify-between">
+                    <div>
+                      <label
+                        for="default-checkbox"
+                        class="ms-2   text-gray-500 "
+                      >
+                        {ele.value.task}
+                      </label>
+                      {/* Priority */}
+                      {getPriorityHtml(ele.value.priority)}
+                      <div className="ml-6 mt-2 flex text-gray-500 text-sm font-bold font-lato container justify-between">
+                        {/* Date */}
+                        <span className="flex w-24 align-middle">
+                          <i class="fa-solid fa-calendar-xmark relative mt-1 mr-2"></i>
+                          <span>{ele.value.dueDate}</span>
+                        </span>
+                        {/* List Type */}
+                        {ele.value.list && (
+                          <div className="flex">
+                            <div
+                              className={`h-4 w-4 bg-${getColor(
+                                listsValue,
+                                ele.value.list
+                              )}-200 rounded-md  mr-2`}
+                            />
+                            <span>{ele.value.list || ""}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* Show Description Button */}
+                    <div className="mr-16 text-gray-500">
+                      {ele.value.description.length > 0 && (
+                        <>
+                          {showDescription.status &&
+                          showDescription.index == index ? (
+                            <i
+                              class="fa-solid fa-angle-down cursor-pointer"
+                              onClick={() => showDescriptionHnalder(index)}
+                            ></i>
+                          ) : (
+                            <i
+                              class="fa-solid fa-chevron-right cursor-pointer"
+                              onClick={() => showDescriptionHnalder(index)}
+                            ></i>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              {index !== todayList.length - 1 && (
-                <hr class="h-px my-3 mr-32 bg-gray-200 border-0 dark:bg-gray-700" />
-              )}
-            </li>
-          );
-        })}
-      </ul>
+                {/* Description */}
+                {showDescription.status && showDescription.index == index && (
+                  <div className="container flex mt-2 ml-20">
+                    <i class="fa-solid fa-arrow-turn-up fa-rotate-90 text-xl text-gray-500"></i>
+                    <span className="font-lato ml-5 text-gray-500">
+                      {ele.value.description}
+                    </span>
+                  </div>
+                )}
+                {index !== todayList.length - 1 && (
+                  <hr class="h-px my-3 mr-32 bg-gray-200 border-0 dark:bg-gray-700" />
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div>
+          <Image
+            alt="No Data"
+            src={noDataImage}
+            width="1000"
+            height="1000"
+          ></Image>
+        </div>
+      )}
     </div>
   );
 }

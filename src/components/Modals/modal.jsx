@@ -1,24 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { modalToggler, taskAdded } from "@/Slices/taskSlice";
+import { database } from "@/firebaseConfig";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import SubmitButton from "../Buttons/SubmitButton";
 import DropDownButton from "../Dropdown/Button";
-import { collection, addDoc } from "firebase/firestore";
-import { database } from "@/firebaseConfig";
-import { dispatcher } from "@/app/utils/utils";
-import { useDispatch } from "react-redux";
-import { modalToggler, taskAdded } from "@/Slices/taskSlice";
+import Calender from "../Calender/calender";
+import { format } from "date-fns";
 
-const dbInstance = collection(database, "Task");
+const dbInstanceList = collection(database, "List");
 
-export default function FormModal() {
+export default function FormModal({ db }) {
   let initialFormValues = {
     task: "",
-    dueDate: "",
+    dueDate: format(Date(), "dd-MM-yyyy"),
     description: "",
     list: "",
     priority: "",
+    completed: false,
+    completedDate: "",
   };
+  const [list, setList] = useState([]);
+  const [showCalender, setShowCalender] = useState(false);
+  const [date, setDate] = useState(format(Date(), "dd-MM-yyyy"));
+
+  const datePickHandler = (datePicked) => {
+    const newDate = format(datePicked, "dd-MM-yyyy");
+    const newData = formData;
+    newData.dueDate = newDate;
+    setFormData(newData);
+    setDate(newDate);
+  };
+
+  useEffect(() => {
+    const getList = () => {
+      getDocs(dbInstanceList).then((data) => {
+        setList(
+          data.docs.map((item) => {
+            const data = item.data();
+            return data.value;
+          })
+        );
+      });
+    };
+    getList();
+  }, []);
+
+  const showCalederHandler = (event) => {
+    event.preventDefault();
+    setShowCalender(!showCalender);
+  };
+
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState(initialFormValues);
@@ -34,6 +68,7 @@ export default function FormModal() {
     newData.list = value;
     setFormData(newData);
   };
+
   const submitPriorityHandler = (value) => {
     const newData = formData;
     newData.priority = value;
@@ -41,14 +76,16 @@ export default function FormModal() {
   };
 
   const submitHandler = (event) => {
-    addDoc(dbInstance, formData).then(setFormData(initialFormValues));
+    addDoc(db, formData).then(setFormData(initialFormValues));
     event.preventDefault();
     dispatch(taskAdded(true));
     dispatch(modalToggler(false));
   };
+
   const onCloseHandler = (event, value) => {
     dispatch(modalToggler(false));
   };
+
   return (
     <>
       <div class="relative z-10" role="dialog" aria-modal="true">
@@ -78,21 +115,26 @@ export default function FormModal() {
                 </label>
               </div>
               <div class="relative z-0 w-full mb-5 group">
-                <input
-                  type="text"
-                  name="floating_phone"
-                  id="floating_phone"
-                  class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  onChange={(e) => formHandler(e, "dueDate")}
-                />
-                <label
-                  for="floating_phone"
-                  class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Due Date
-                </label>
+                <div className="container m-5  flex  h-10 w-auto font-lato">
+                  <span className=" relative  text-gray-500 dark:text-gray-400 top-2 ">
+                    Due Date :
+                  </span>
+                  <button
+                    className="ml-5 w-24 h-10 border rounded-md text-sm font-bold text-gray-500"
+                    onClick={(e) => showCalederHandler(e)}
+                  >
+                    {date}
+                  </button>
+                </div>
+                {showCalender && (
+                  <div className="z-10 absolute">
+                    <Calender
+                      clickEvent={datePickHandler}
+                      setShowCalender={setShowCalender}
+                      value={date}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div class="mb-5">
@@ -112,7 +154,11 @@ export default function FormModal() {
             </div>
             <div class="container flex mb-16 ">
               <div class="relative mb-5 ">
-                <DropDownButton label="List" callBack={submitListHandler} />
+                <DropDownButton
+                  label="List"
+                  list={list}
+                  callBack={submitListHandler}
+                />
               </div>
               <div class="relative mb-5 ml-5">
                 <DropDownButton

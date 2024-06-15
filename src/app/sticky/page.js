@@ -3,7 +3,7 @@
 import { modalToggler } from "@/Slices/taskSlice";
 import StickyModal from "@/components/Modals/stickyModal";
 import { database } from "@/firebaseConfig";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getRandomColor } from "../utils/utils";
@@ -34,6 +34,12 @@ export default function sticky() {
     };
   }, []);
 
+  const deleteHandler = (event, id) => {
+    const collectionById = doc(database, "StickyNotes", id);
+    deleteDoc(collectionById);
+    event.preventDefault();
+  };
+
   useEffect(() => {
     setModal(task.modelStatus);
   }, [task.modelStatus]);
@@ -55,6 +61,7 @@ export default function sticky() {
                   class={`rounded-lg p-7 bg-${ele.color}-200 min-h-96 shadow-2xl`}
                   key={index}
                   data-id={ele.id}
+                  onClick={(e) => deleteHandler(e, ele.id)}
                 >
                   <h1 className="font-bold text-2xl font-lato text-gray-800 mb-5">
                     {ele.value.task}
