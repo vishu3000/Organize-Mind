@@ -51,7 +51,7 @@ const Navigation = () => {
       });
 
       setCompletedtaskCount(newData.length);
-      setAllTask(snapshot.docs);
+      setAllTask(snapshot.docs.filter((ele) => ele.data().uid == userInfo.uid));
     });
 
     // Clean up the listener when the component unmounts
@@ -329,12 +329,12 @@ const Navigation = () => {
             </div> */}
 
             {/* Setting */}
-            <div className="container flex justify-start">
+            <Link href="/settings" className="container flex justify-start">
               <i class="fa-solid fa-sliders text-gray-700 top-1 relative"></i>
               <span className="font-medium font-lato text-gray-700 ml-2">
                 Settings
               </span>
-            </div>
+            </Link>
 
             {/* LogOut */}
             <div
