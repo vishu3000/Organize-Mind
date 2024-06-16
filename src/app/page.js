@@ -15,6 +15,7 @@ const dbInstance = collection(database, "Task");
 export default function Home() {
   const dispatch = useDispatch();
   const task = useSelector((state) => state.tasks);
+  const userInfo = task.userInfo;
   const listsValue = task.lists;
 
   const [listObject, setListObject] = useState(task.taskObject);
@@ -34,6 +35,7 @@ export default function Home() {
         const id = doc.id;
         const value = detail.task;
         const date = detail.dueDate;
+        const uid = detail.uid;
 
         return {
           value: value,
@@ -44,9 +46,12 @@ export default function Home() {
           priority: detail.priority,
           completed: detail.completed,
           compltedDate: detail.completedDate,
+          uid: uid,
         };
       });
-      const filteredData = newData.filter((ele) => ele.completed == false);
+      const filteredData = newData.filter(
+        (ele) => ele.completed == false && ele.uid == userInfo.uid
+      );
       setNumerOfTask(filteredData.length);
       setListObject(filteredData);
       dispatch(taskObject(filteredData));

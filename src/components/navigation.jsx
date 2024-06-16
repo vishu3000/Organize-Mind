@@ -1,13 +1,17 @@
 "use client";
 import { lists } from "@/Slices/taskSlice";
 import { ListFormColors, getCount } from "@/app/utils/utils";
-import { database } from "@/firebaseConfig";
+import { auth, database } from "@/firebaseConfig";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { addDoc, collection, getDocs, onSnapshot } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SearchBar from "./SearchBar/SearchBar";
+import Image from "next/image";
+import profilePicture from "../../public/profilePlaceHolder.jpg";
 
 const dbInstance = collection(database, "List");
 const dbInstanceTask = collection(database, "Task");
@@ -19,8 +23,12 @@ const Navigation = () => {
   const [listList, setListList] = useState([]);
   const [completedTaskCount, setCompletedtaskCount] = useState(0);
   const [allTask, setAllTask] = useState([]);
+  const router = useRouter();
 
   const dispatch = useDispatch();
+  const taskHandler = useSelector((state) => state.tasks);
+  const blur = taskHandler.modelStatus;
+  const userInfo = taskHandler.userInfo;
 
   useEffect(() => {
     // Create a function to handle updates and unsubscribe from the listener when the component unmounts
@@ -31,15 +39,15 @@ const Navigation = () => {
         const id = doc.id;
         const value = detail.value;
         const color = detail.color;
-        return { value: value, id: id, color: color };
+        return { value: value, id: id, color: color, uid: detail.uid };
       });
-      setListList(newData);
+      setListList(newData.filter((ele) => ele.uid == userInfo.uid));
       dispatch(lists(newData));
     });
     const unsubscribeTask = onSnapshot(dbInstanceTask, (snapshot) => {
       // Process the data from the Firestore snapshot
       const newData = snapshot.docs.filter((doc) => {
-        return doc.data().completed == true;
+        return doc.data().completed == true && doc.data().uid == userInfo.uid;
       });
 
       setCompletedtaskCount(newData.length);
@@ -56,11 +64,10 @@ const Navigation = () => {
   let initialListFormValue = {
     value: "",
     color: "",
+    uid: userInfo.uid,
   };
   const [listFormValue, setListFormValue] = useState(initialListFormValue);
 
-  const taskHandler = useSelector((state) => state.tasks);
-  const blur = taskHandler.modelStatus;
   const { overAllCount, todayCount } = getCount(allTask);
 
   const enableToggle = () => {
@@ -90,6 +97,12 @@ const Navigation = () => {
     const newData = listFormValue;
     newData.color = color;
     setShowListInput(newData);
+  };
+
+  const SignOutHandler = (event) => {
+    event.preventDefault();
+    router.push("/");
+    signOut(auth).then(() => console.log("SIGNED OUT"));
   };
 
   return (
@@ -123,11 +136,24 @@ const Navigation = () => {
               ></i>
             </button>
           </div>
+          {/* User Info */}
+          <div className=" relative container flex p-1 min-h-8">
+            <Image
+              alt="No Data"
+              src={profilePicture}
+              width="40"
+              height="40"
+              className=" border rounded-full w-10 h-10 mr-2 "
+            ></Image>
 
+            <h1 className="font-semibold text-xl font-lato text-gray-500 mt-1">
+              {userInfo.email}
+            </h1>
+          </div>
           {/* Search Bar */}
           <SearchBar allTask={allTask} />
 
-          <div className="container mt-10">
+          <div className="container mt-7">
             {/* Tasks */}
             <div className="container mt-6">
               <span className="font-medium text-lg font-lato text-gray-700">
@@ -311,7 +337,10 @@ const Navigation = () => {
             </div>
 
             {/* LogOut */}
-            <div className="container flex justify-start mt-2 mb-2">
+            <div
+              className="container flex justify-start mt-2 mb-2  cursor-pointer"
+              onClick={(e) => SignOutHandler(e)}
+            >
               <i class="fa-solid fa-right-from-bracket text-gray-700 top-1 relative"></i>
               <span className="font-medium font-lato text-gray-700 ml-2">
                 Log Out

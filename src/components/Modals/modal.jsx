@@ -4,7 +4,7 @@ import { modalToggler, taskAdded } from "@/Slices/taskSlice";
 import { database } from "@/firebaseConfig";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SubmitButton from "../Buttons/SubmitButton";
 import DropDownButton from "../Dropdown/Button";
 import Calender from "../Calender/calender";
@@ -13,6 +13,8 @@ import { format } from "date-fns";
 const dbInstanceList = collection(database, "List");
 
 export default function FormModal({ db }) {
+  const initialState = useSelector((state) => state.tasks);
+  const userInfo = initialState.userInfo;
   let initialFormValues = {
     task: "",
     dueDate: format(Date(), "dd-MM-yyyy"),
@@ -21,6 +23,7 @@ export default function FormModal({ db }) {
     priority: "",
     completed: false,
     completedDate: "",
+    uid: userInfo.uid,
   };
   const [list, setList] = useState([]);
   const [showCalender, setShowCalender] = useState(false);
@@ -37,8 +40,11 @@ export default function FormModal({ db }) {
   useEffect(() => {
     const getList = () => {
       getDocs(dbInstanceList).then((data) => {
+        const filteredUserList = data.docs.filter(
+          (item) => item.data().uid == userInfo.uid
+        );
         setList(
-          data.docs.map((item) => {
+          filteredUserList.map((item) => {
             const data = item.data();
             return data.value;
           })

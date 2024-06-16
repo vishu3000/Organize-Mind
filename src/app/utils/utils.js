@@ -112,7 +112,7 @@ export const getColor = (listValue, listType) => {
   if (listType == "Others") {
     return "black";
   }
-  return desiredObject.color;
+  return desiredObject?.color;
 };
 
 export const getRouteDetail = (value, list) => {
@@ -121,7 +121,6 @@ export const getRouteDetail = (value, list) => {
     const taskValue = ele.data().task;
     return taskValue.toLowerCase() == value.toLowerCase();
   });
-  console.log(targetObject.data());
 
   if (targetObject == undefined) {
     return "no match";
