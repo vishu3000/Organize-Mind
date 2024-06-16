@@ -1,15 +1,16 @@
 "use client";
 
-import { Provider } from "react-redux";
 import { store } from "@/store";
-import Navigation from "@/components/navigation";
+import { Provider } from "react-redux";
+import AuthWrapper from "./Auth";
 
 const App = (props) => {
   return (
-    <Provider store={store}>
-      <Navigation />
-      {props.children}
-    </Provider>
+    <>
+      <Provider store={store}>
+        <AuthWrapper>{props.children}</AuthWrapper>
+      </Provider>
+    </>
   );
 };
 

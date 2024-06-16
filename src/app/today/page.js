@@ -1,12 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { database } from "@/firebaseConfig";
+import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import noDataImage from "../../../public/NoData.jpg";
 import { differenceInDays, getColor, getPriorityHtml } from "../utils/utils";
-import { format } from "date-fns";
-import { useSelector } from "react-redux";
 
 const dbInstance = collection(database, "Task");
 
@@ -14,6 +13,7 @@ export default function Today() {
   const [todayList, setTodayList] = useState([]);
   const [numberOfTask, setNumerOfTask] = useState(0);
   const task = useSelector((state) => state.tasks);
+  const userInfo = task.userInfo;
   const listsValue = task.lists;
 
   const [showDescription, setShowDescription] = useState({
@@ -35,7 +35,8 @@ export default function Today() {
           const value = detail;
           if (
             differenceInDays(detail.dueDate) == 0 &&
-            detail.completed != true
+            detail.completed != true &&
+            detail.uid == userInfo.uid
           ) {
             dummyList = [{ value: value, id: id }, ...dummyList];
           }

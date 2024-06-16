@@ -15,6 +15,7 @@ export default function Page({ params }) {
 
   const task = useSelector((state) => state.tasks);
   const listsValue = task.lists;
+  const userInfo = task.userInfo;
 
   const [showDescription, setShowDescription] = useState({
     status: false,
@@ -35,7 +36,8 @@ export default function Page({ params }) {
           const value = detail;
           if (
             detail.list.toLowerCase() == listType.toLowerCase() &&
-            detail.completed != true
+            detail.completed != true &&
+            detail.uid == userInfo.uid
           ) {
             dummyList = [{ value: value, id: id }, ...dummyList];
           }

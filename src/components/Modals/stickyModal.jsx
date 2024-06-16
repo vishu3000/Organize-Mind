@@ -2,14 +2,17 @@ import { addDoc, collection } from "firebase/firestore";
 import SubmitButton from "../Buttons/SubmitButton";
 import { database } from "@/firebaseConfig";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { modalToggler } from "@/Slices/taskSlice";
 
 const dbInstance = collection(database, "StickyNotes");
 export default function StickyModal() {
+  const initialState = useSelector((state) => state.tasks);
+  const userInfo = initialState.userInfo;
   let initialFormValues = {
     task: "",
     description: "",
+    uid: userInfo.uid,
   };
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialFormValues);

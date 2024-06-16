@@ -31,6 +31,7 @@ export default function Completed() {
   const [numberOfTask, setNumerOfTask] = useState(0);
 
   const listDetail = useSelector((state) => state.tasks.lists);
+  const userInfo = useSelector((state) => state.tasks.userInfo);
 
   useEffect(() => {
     const listData = () => {
@@ -39,7 +40,7 @@ export default function Completed() {
         data.docs.forEach((item) => {
           const detail = item.data();
           const id = item.id;
-          if (detail.completed == true) {
+          if (detail.completed == true && detail.uid == userInfo.uid) {
             dummyList = [{ value: detail, id: id }, ...dummyList];
           }
         });

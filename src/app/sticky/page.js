@@ -12,6 +12,7 @@ const dbInstance = collection(database, "StickyNotes");
 export default function sticky() {
   const dispatch = useDispatch();
   const task = useSelector((state) => state.tasks);
+  const userInfo = task.userInfo;
   const [modal, setModal] = useState(task.modelStatus);
   const [list, setList] = useState([]);
 
@@ -25,7 +26,7 @@ export default function sticky() {
         const color = getRandomColor();
         return { value: detail, id: id, color: color };
       });
-      setList(newData);
+      setList(newData.filter((ele) => ele.value.uid == userInfo.uid));
     });
 
     // Clean up the listener when the component unmounts

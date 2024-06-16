@@ -7,6 +7,7 @@ const initialState = {
   modelStatus: false,
   lists: [],
   updateId: null,
+  userInfo: {},
 };
 
 const HPtaskSlice = createSlice({
@@ -33,9 +34,19 @@ const HPtaskSlice = createSlice({
       state.updateId = action.payload;
       return state;
     },
+    setUserInfo: (state, action) => {
+      state.userInfo = action.payload;
+      return state;
+    },
   },
 });
 
-export const { taskAdded, taskObject, modalToggler, lists, updateTaskId } =
-  HPtaskSlice.actions;
+export const {
+  taskAdded,
+  taskObject,
+  modalToggler,
+  lists,
+  updateTaskId,
+  setUserInfo,
+} = HPtaskSlice.actions;
 export default HPtaskSlice.reducer;

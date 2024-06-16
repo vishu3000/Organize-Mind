@@ -24,7 +24,7 @@ export default function SearchBar(props) {
     setSearchValue(value);
   };
   return (
-    <form class={`max-w-md mx-auto mt-7 `}>
+    <form class={`max-w-md mx-auto mt-5 `}>
       <label
         for="default-search"
         class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"

@@ -1,9 +1,6 @@
 /* eslint-disable @next/next/no-sync-scripts */
-import Navigation from "@/components/navigation";
-import "./globals.css";
-import { Provider } from "react-redux";
-import { store } from "@/store";
 import App from "@/Wrappers/app";
+import "./globals.css";
 
 export const metadata = {
   title: "Organic Mind",
