@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import noDataImage from "../../../public/NoData.jpg";
 import { differenceInDays, getColor, getPriorityHtml } from "../utils/utils";
+import { motion } from "framer-motion";
 
 const dbInstance = collection(database, "Task");
 
@@ -49,7 +50,15 @@ export default function Today() {
   }, []);
 
   return (
-    <div className="container m-8">
+    <motion.div
+      className="container m-8"
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 1,
+        ease: [0, 0.71, 0.2, 1.01],
+      }}
+    >
       {/* Heading */}
       <div className="flex m-8">
         <h1 className="font-bold text-6xl font-lato text-gray-700">Today</h1>
@@ -143,6 +152,6 @@ export default function Today() {
           ></Image>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

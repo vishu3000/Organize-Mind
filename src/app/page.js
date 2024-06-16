@@ -10,6 +10,7 @@ import { modalToggler, taskObject } from "@/Slices/taskSlice";
 import FormModal from "@/components/Modals/modal";
 import UpdatePanel from "@/components/UpdatePanel";
 import { getFilteredList, getRestFilteredList } from "./utils/utils";
+import { motion } from "framer-motion";
 
 const dbInstance = collection(database, "Task");
 export default function Home() {
@@ -69,10 +70,16 @@ export default function Home() {
 
   return (
     <>
-      <div
+      <motion.div
         className={`container m-8 ${modal ? "blur-sm" : ""} w-full ${
           showUpdatePanel ? "flex" : ""
         }`}
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 1,
+          ease: [0, 0.71, 0.2, 1.01],
+        }}
       >
         <div className={`${showUpdatePanel ? "w-3/4" : ""}`}>
           {/* Heading */}
@@ -134,7 +141,7 @@ export default function Home() {
             dbInstance={dbInstance}
           />
         )}
-      </div>
+      </motion.div>
 
       {modal && <FormModal db={dbInstance} />}
     </>

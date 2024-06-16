@@ -4,13 +4,22 @@ import Image from "next/image";
 import profilePicture from "../../../public/profilePlaceHolder.jpg";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
 
 export default function Settings() {
   const UserInfo = useSelector((state) => state.tasks.userInfo);
   console.log(UserInfo);
   console.log(UserInfo.metadata.lastLoginAt);
   return (
-    <div className="container m-8">
+    <motion.div
+      className="container m-8"
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 1,
+        ease: [0, 0.71, 0.2, 1.01],
+      }}
+    >
       {/* Heading */}
       <div className="flex m-8">
         <h1 className="font-bold text-6xl font-lato text-gray-700">Settings</h1>
@@ -47,6 +56,6 @@ export default function Settings() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
