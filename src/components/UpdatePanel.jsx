@@ -134,12 +134,12 @@ export default function UpdatePanel(props) {
         <div className="container max-w-56 flex justify-around align-middle ml-12 mb-2 mt-28">
           <SubmitButton
             heading="Delete"
-            colorCode="red"
+            // colorCode="red"
             callBackFunction={deleteHandler}
           />
           <SubmitButton
             heading="Save Changes"
-            colorCode="yellow"
+            // colorCode="yellow"
             callBackFunction={submitHandler}
           />
         </div>

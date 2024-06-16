@@ -181,7 +181,7 @@ export default function FormModal({ db }) {
               />
               <SubmitButton
                 heading="Close"
-                colorCode="yellow"
+                // colorCode="yellow"
                 callBackFunction={onCloseHandler}
               />
             </div>

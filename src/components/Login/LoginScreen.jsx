@@ -64,8 +64,8 @@ export default function LoginScreen() {
           const errorCode = error.code;
           const errorMessage = error.message;
           console.log(errorCode, errorMessage);
-           setInvalid(true);
-           setErrorMessage(errorMessage);
+          setInvalid(true);
+          setErrorMessage(errorMessage);
           // ..
         });
     }
@@ -194,7 +194,6 @@ export default function LoginScreen() {
           )}
           <SubmitButton
             heading={isSignUp ? "Register" : "Sign in"}
-            colorCode="yellow"
             callBackFunction={submitHandler}
             disabled={invalid}
           />

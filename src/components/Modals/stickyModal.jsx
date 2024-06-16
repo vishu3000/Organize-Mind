@@ -76,12 +76,12 @@ export default function StickyModal() {
             <div className="container max-w-56 flex justify-around align-middle ml-56 mb-6">
               <SubmitButton
                 heading="Submit"
-                colorCode="gray"
+                // colorCode="gray"
                 callBackFunction={submitHandler}
               />
               <SubmitButton
                 heading="Close"
-                colorCode="yellow"
+                // colorCode="yellow"
                 callBackFunction={onCloseHandler}
               />
             </div>
