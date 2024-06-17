@@ -194,6 +194,7 @@ export default function LoginScreen() {
           )}
           <SubmitButton
             heading={isSignUp ? "Register" : "Sign in"}
+            colorCode={"yellow"}
             callBackFunction={submitHandler}
             disabled={invalid}
           />

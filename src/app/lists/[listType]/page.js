@@ -78,7 +78,7 @@ export default function Page({ params }) {
             return (
               <li className="container pt-3 ml-6" key={index} id={ele.id}>
                 <div className="">
-                  <div class="flex items-center  text-xl ">
+                  <div class="flex items-center  text-xl justify-between">
                     <div>
                       <label
                         for="default-checkbox"

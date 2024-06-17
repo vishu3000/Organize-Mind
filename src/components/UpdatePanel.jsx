@@ -131,7 +131,7 @@ export default function UpdatePanel(props) {
             callBack={(e) => formHandler(e, "priority")}
           />
         </div>
-        <div className="container max-w-56 flex justify-around align-middle ml-12 mb-2 mt-28">
+        <div className="container max-w-56 grid grid-cols-2 gap-4 ml-12 mb-2 mt-28">
           <SubmitButton
             heading="Delete"
             // colorCode="red"
@@ -139,7 +139,7 @@ export default function UpdatePanel(props) {
           />
           <SubmitButton
             heading="Save Changes"
-            // colorCode="yellow"
+            colorCode="yellow"
             callBackFunction={submitHandler}
           />
         </div>

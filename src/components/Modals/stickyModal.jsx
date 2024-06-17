@@ -73,7 +73,7 @@ export default function StickyModal() {
                 onChange={(e) => formHandler(e, "description")}
               ></textarea>
             </div>
-            <div className="container max-w-56 flex justify-around align-middle ml-56 mb-6">
+            <div className="container max-w-56 grid grid-cols-2 gap-4 ml-56 mb-6">
               <SubmitButton
                 heading="Submit"
                 // colorCode="gray"
@@ -81,7 +81,7 @@ export default function StickyModal() {
               />
               <SubmitButton
                 heading="Close"
-                // colorCode="yellow"
+                colorCode="yellow"
                 callBackFunction={onCloseHandler}
               />
             </div>
